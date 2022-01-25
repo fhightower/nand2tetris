@@ -40,3 +40,8 @@ export DISPLAY=<YOUR-LOCAL-IP-HERE>:0
 bash tools/HardwareSimulator.sh
 ```
 
+## Credits
+
+- [goropikari/nand2tetris](https://github.com/goropikari/nand2tetris) - This project contributed the docker image and the idea of using x11 to display a GUI in a docker container in the host
+- [Running GUI’s with Docker on Mac OS X](https://cntnr.io/running-guis-with-docker-on-mac-os-x-a14df6a76efc) - Very helpful guide showing how to use `socat` and x11/xquartz
+- [Bring Linux apps to the Mac Desktop with Docker](https://blog.alexellis.io/linux-desktop-on-mac/) - Ditto ^
