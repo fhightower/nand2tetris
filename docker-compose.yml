@@ -1,6 +1,6 @@
 version: "3"
 services:
-  ubuntu:
+  dev:
     build: .
     environment:
       - DISPLAY=$DISPLAY
@@ -10,3 +10,4 @@ services:
       - $HOME/.Xauthority:/home/ubuntu/.Xauthority
     tty: true
     stdin_open: true
+    command: ["bash"]

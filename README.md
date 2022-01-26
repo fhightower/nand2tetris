@@ -35,9 +35,9 @@ echo $LOCAL_IP
 Finally, we are ready to run our docker container (replacing `<YOUR-LOCAL-IP-HERE>` with the `$LOCAL_IP` from the previous code block):
 
 ```bash
-docker-compose run ubuntu bash
+docker-compose run --rm dev
 export DISPLAY=<YOUR-LOCAL-IP-HERE>:0
-bash tools/HardwareSimulator.sh
+bash nand2tetris/tools/HardwareSimulator.sh
 ```
 
 ## Credits
