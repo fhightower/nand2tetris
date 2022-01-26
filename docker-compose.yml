@@ -1,0 +1,12 @@
+version: "3"
+services:
+  ubuntu:
+    build: .
+    environment:
+      - DISPLAY=$DISPLAY
+    network_mode: "host"
+    volumes:
+      - .:/home/ubuntu
+      - $HOME/.Xauthority:/home/ubuntu/.Xauthority
+    tty: true
+    stdin_open: true

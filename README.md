@@ -45,3 +45,4 @@ bash tools/HardwareSimulator.sh
 - [goropikari/nand2tetris](https://github.com/goropikari/nand2tetris) - This project contributed the docker image and the idea of using x11 to display a GUI in a docker container in the host
 - [Running GUI’s with Docker on Mac OS X](https://cntnr.io/running-guis-with-docker-on-mac-os-x-a14df6a76efc) - Very helpful guide showing how to use `socat` and x11/xquartz
 - [Bring Linux apps to the Mac Desktop with Docker](https://blog.alexellis.io/linux-desktop-on-mac/) - Ditto ^
+- [nand2tetris website](https://www.nand2tetris.org/software) contains the base source code used in this project as well as guides for how to setup a computer to run these files
