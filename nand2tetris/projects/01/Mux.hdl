@@ -14,5 +14,13 @@ CHIP Mux {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    /* UPPER BRANCH */
+    Not(in=sel, out=notSel);
+    And(a=a, b=notSel, out=aAndNotSel);
+
+    /* LOWER BRANCH */
+    And(a=sel, b=b, out=bAndSel);
+
+    /* COMBINING GATE */
+    Or(a=aAndNotSel, b=bAndSel, out=out);
 }
