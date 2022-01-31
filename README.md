@@ -28,8 +28,7 @@ socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"
 Now, in another window, run this:
 
 ```bash
-LOCAL_IP=$(ifconfig en0 | grep "inet " | cut -d' ' -f2)
-echo $LOCAL_IP
+ifconfig en0 | grep "inet " | cut -d' ' -f2
 ```
 
 Finally, we are ready to run our docker container (replacing `<YOUR-LOCAL-IP-HERE>` with the `$LOCAL_IP` from the previous code block):
