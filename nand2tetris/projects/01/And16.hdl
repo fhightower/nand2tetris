@@ -8,6 +8,9 @@
  * for i = 0..15: out[i] = (a[i] and b[i])
  */
 
+
+// generated from this script: https://nextjournal.com/a/PrMmEsakGyVTa82axhwBm/edit
+
 CHIP And16 {
     IN a[16], b[16];
     OUT out[16];

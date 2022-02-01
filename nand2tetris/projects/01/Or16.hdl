@@ -8,6 +8,8 @@
  * for i = 0..15 out[i] = (a[i] or b[i])
  */
 
+// generated from this script: https://nextjournal.com/a/PrMmEsakGyVTa82axhwBm/edit
+
 CHIP Or16 {
     IN a[16], b[16];
     OUT out[16];

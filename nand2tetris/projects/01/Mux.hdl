@@ -21,6 +21,6 @@ CHIP Mux {
     // LOWER BRANCH
     And(a=sel, b=b, out=bAndSel);
 
-    /* COMBINING GATE */
+    // COMBINING GATE
     Or(a=aAndNotSel, b=bAndSel, out=out);
 }

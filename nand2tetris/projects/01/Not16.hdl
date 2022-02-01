@@ -8,6 +8,8 @@
  * for i=0..15: out[i] = not in[i]
  */
 
+// generated from this script: https://nextjournal.com/a/PrMmEsakGyVTa82axhwBm/edit
+
 CHIP Not16 {
     IN in[16];
     OUT out[16];
