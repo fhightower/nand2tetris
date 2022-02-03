@@ -11,6 +11,8 @@
  *                            {0, 0, 0, 0, 0, 0, 0, in} if sel == 111
  */
 
+// generated from this script: https://nextjournal.com/a/PrMmEsakGyVTa82axhwBm/edit#8-way-demultiplexor
+
 CHIP DMux8Way {
     IN in, sel[3];
     OUT a, b, c, d, e, f, g, h;
