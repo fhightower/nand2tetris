@@ -19,7 +19,7 @@ open -a Xquartz
 
 ## Usage
 
-Run `socat` in a terminal window "to create a tunnel from an open X11 port (6000) through to the local UNIX socket where XQuartz is listening for connections" ([source]https://blog.alexellis.io/linux-desktop-on-mac/#:~:text=to%20create%20a%20tunnel%20from%20an%20open%20X11%20port%20(6000)%20through%20to%20the%20local%20UNIX%20socket%20where%20XQuartz%20is%20listening%20for%20connections()). Socat will block, so you'll need to open another window after running this command:
+Run `socat` in a terminal window "to create a tunnel from an open X11 port (6000) through to the local UNIX socket where XQuartz is listening for connections" ([source](https://blog.alexellis.io/linux-desktop-on-mac/#:~:text=to%20create%20a%20tunnel%20from%20an%20open%20X11%20port%20(6000)%20through%20to%20the%20local%20UNIX%20socket%20where%20XQuartz%20is%20listening%20for%20connections)). Socat will block, so you'll need to open another window after running this command:
 
 ```bash
 socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"
