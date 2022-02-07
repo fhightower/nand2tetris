@@ -1,0 +1,18 @@
+// File name: projects/02/MoreThanOne.hdl
+
+/**
+ * Return 1 if more than one of the inputs is 1, otherwise return zero
+ */
+
+CHIP MoreThanOne {
+    IN a, b, c;  // 1-bit inputs
+    OUT out;
+
+    PARTS:
+    And(a=a, b=b, out=o1);
+    And(a=a, b=c, out=o2);
+    And(a=b, b=c, out=o3);
+
+    Or(a=o1, b=o2, out=o4);
+    Or(a=o3, b=o4, out=out);
+}
