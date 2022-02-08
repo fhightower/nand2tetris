@@ -13,5 +13,6 @@ CHIP Inc16 {
     OUT out[16];
 
     PARTS:
-   // Put you code here:
+    // b is assumed 16 zeros; here, we set the first one to 1
+    Add16(a=in, b[0]=true, out=out);
 }
