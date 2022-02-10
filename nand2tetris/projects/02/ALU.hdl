@@ -65,9 +65,9 @@ CHIP ALU {
     Not16(in=newOut1, out=notNewOut1);
     Mux16(a=newOut1, b=notNewOut1, sel=no, out=newOut2);
 
-    // TODO: implement zr and ng
-    // my first attempt at ng was to check the most significant bit, but this doesn't work as sub buses of internal nodes can't be accessed
-    // And(a=newOut2[15], b=newOut2[15], out=ng);
+    Neg16(in=newOut2, ng=ng);
+
+    // TODO: implement zr
 
     // repeat newOut2 as out
     Or16(a=newOut2, b=newOut2, out=out);
