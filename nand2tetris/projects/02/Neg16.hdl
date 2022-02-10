@@ -1,0 +1,14 @@
+// File name: projects/02/Neg16.hdl
+
+/**
+ * Return whether the given 16 bit is negative.
+ */
+
+CHIP Neg16 {
+    IN in[16]; // 16-bit input
+
+    OUT ng; // 1 if (in < 0), 0 otherwise
+
+    PARTS:
+    And(a=in[15], b=in[15], out=ng);
+}
