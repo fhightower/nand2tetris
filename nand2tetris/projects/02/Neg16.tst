@@ -6,7 +6,7 @@
 load Neg16.hdl,
 output-file Neg16.out,
 compare-to Neg16.cmp,
-output-list in%B1.16.1 ng%B2.1.2;
+output-list in%B1.16.1 out%B2.1.2;
 
 set in %B0000000000000000,  // in = 0
 eval,

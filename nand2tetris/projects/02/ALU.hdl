@@ -65,7 +65,7 @@ CHIP ALU {
     Not16(in=newOut1, out=notNewOut1);
     Mux16(a=newOut1, b=notNewOut1, sel=no, out=newOut2);
 
-    Neg16(in=newOut2, ng=ng);
+    Neg16(in=newOut2, out=ng);
 
     // TODO: implement zr
 

@@ -7,8 +7,8 @@
 CHIP Neg16 {
     IN in[16]; // 16-bit input
 
-    OUT ng; // 1 if (in < 0), 0 otherwise
+    OUT out; // 1 if (in < 0), 0 otherwise
 
     PARTS:
-    And(a=in[15], b=in[15], out=ng);
+    And(a=in[15], b=in[15], out=out);
 }
