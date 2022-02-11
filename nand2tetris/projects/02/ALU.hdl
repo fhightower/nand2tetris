@@ -67,7 +67,7 @@ CHIP ALU {
 
     Neg16(in=newOut2, out=ng);
 
-    // TODO: implement zr
+    Zr16(in=newOut2, out=zr);
 
     // repeat newOut2 as out
     Or16(a=newOut2, b=newOut2, out=out);
