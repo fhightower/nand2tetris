@@ -1,0 +1,19 @@
+// File name: projects/03/a/RAM4.hdl
+
+/**
+ * Memory of 4 registers, each 16 bit-wide. Out holds the value
+ * stored at the memory location specified by address. If load==1, then 
+ * the in value is loaded into the memory location specified by address 
+ * (the loaded value will be emitted to out from the next time step onward).
+ */
+
+CHIP RAM4 {
+    IN in[16], load, address[2];
+    OUT out[16];
+
+    PARTS:
+    RAM2(in=in, load=load, address=address[0], out=r0);
+    RAM2(in=in, load=load, address=address[0], out=r1);
+
+    Mux16(a=r0, b=r1, sel=address[1], out=out);
+}

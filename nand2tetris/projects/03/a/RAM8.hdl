@@ -15,5 +15,8 @@ CHIP RAM8 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    RAM4(in=in, load=load, address=address[0..1], out=r0);
+    RAM4(in=in, load=load, address=address[0..1], out=r1);
+
+    Mux16(a=r0, b=r1, sel=address[2], out=out);
 }

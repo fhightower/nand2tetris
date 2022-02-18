@@ -1,0 +1,23 @@
+// File name: projects/03/a/RAM2.hdl
+
+/**
+ * Memory of 2 registers, each 16 bit-wide. Out holds the value
+ * stored at the memory location specified by address. If load==1, then 
+ * the in value is loaded into the memory location specified by address 
+ * (the loaded value will be emitted to out from the next time step onward).
+ */
+
+CHIP RAM2 {
+    IN in[16], load, address;
+    OUT out[16];
+
+    PARTS:
+    Not(in=address, out=notAddress);
+    And(a=load, b=notAddress, out=l0);
+    Register(in=in, load=l0, out=r0);
+
+    And(a=load, b=address, out=l1);
+    Register(in=in, load=l1, out=r1);
+
+    Mux16(a=r0, b=r1, sel=address, out=out);
+}
