@@ -10,6 +10,10 @@
  * (the loaded value will be emitted to out from the next time step onward).
  */
 
+// up to this point, I chose to implement the RAM chips by splitting it into two, RAM(n/2) where n = number of registers
+// I found this exercise helpful in getting a feel for how RAM works. In subsequent, RAM chips, I've taken a different approach,
+// implementing the functionality w/o splitting RAM functionality in half each time.
+
 CHIP RAM8 {
     IN in[16], load, address[3];
     OUT out[16];

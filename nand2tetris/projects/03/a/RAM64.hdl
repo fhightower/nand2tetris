@@ -10,10 +10,25 @@
  * (the loaded value will be emitted to out from the next time step onward).
  */
 
+
+// this is implemented differently from the RAM8 as I didn't split the functionality in half
+// like I did for the RAM8 chip (e.g. implementing RAM8 as two RAM4 chips)
+
 CHIP RAM64 {
     IN in[16], load, address[6];
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    DMux8Way(in=load, sel=address[3..5], a=a, b=b, c=c, d=d, e=e, f=f, g=g, h=h);
+
+    RAM8(in=in, load=a, address=address[0..2], out=r0);
+    RAM8(in=in, load=b, address=address[0..2], out=r1);
+    RAM8(in=in, load=c, address=address[0..2], out=r2);
+    RAM8(in=in, load=d, address=address[0..2], out=r3);
+    RAM8(in=in, load=e, address=address[0..2], out=r4);
+    RAM8(in=in, load=f, address=address[0..2], out=r5);
+    RAM8(in=in, load=g, address=address[0..2], out=r6);
+    RAM8(in=in, load=h, address=address[0..2], out=r7);
+
+    Mux8Way16(a=r0, b=r1, c=r2, d=r3, e=r4, f=r5, g=r6, h=r7, sel=address[3..5], out=out);
 }
