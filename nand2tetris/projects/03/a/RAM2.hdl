@@ -12,12 +12,9 @@ CHIP RAM2 {
     OUT out[16];
 
     PARTS:
-    Not(in=address, out=notAddress);
-    And(a=load, b=notAddress, out=l0);
-    Register(in=in, load=l0, out=r0);
-
-    And(a=load, b=address, out=l1);
-    Register(in=in, load=l1, out=r1);
+    DMux(in=load, sel=address, a=a, b=b);
+    Register(in=in, load=a, out=r0);
+    Register(in=in, load=b, out=r1);
 
     Mux16(a=r0, b=r1, sel=address, out=out);
 }
