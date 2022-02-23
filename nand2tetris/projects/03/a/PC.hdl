@@ -16,16 +16,17 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    Mux16(a=in, b[0..15]=false, sel=reset, out=inMaybeReset);
-
+    // if (inc[t] == 1)...
     Inc16(in=lastOut, out=incOut);
-    Not(in=load, out=notLoad);
-    And(a=inc, b=notLoad, out=newInc);
-    Not(in=reset, out=notReset);
-    And(a=newInc, b=notReset, out=finalInc);
-    Mux16(a=inMaybeReset, b=incOut, sel=finalInc, out=newIn);
+    Mux16(a=lastOut, b=incOut, sel=inc, out=lastOrInc);
+    // if (load[t] == 1)...
+    Mux16(a=lastOrInc, b=in, sel=load, out=loadOrElse);
+    // if (reset[t] == 1)...
+    Mux16(a=loadOrElse, b[0..15]=false, sel=reset, out=resetOrElse);
 
-    Or(a=load, b=finalInc, out=shouldLoad);
-    Or(a=shouldLoad, b=reset, out=finalShouldLoad);
-    Register(in=newIn, load=finalShouldLoad, out=lastOut, out=out);
+    // determine if we should load a new value into memory
+    Or(a=inc, b=load, out=incOrLoad);
+    Or(a=incOrLoad, b=reset, out=shouldLoad);
+
+    Register(in=resetOrElse, load=shouldLoad, out=lastOut, out=out);
 }
