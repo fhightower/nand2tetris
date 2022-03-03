@@ -1,3 +1,5 @@
+// File name: projects/04/add/Add.tst
+
 load Add.asm,
 output-file Add.out,
 compare-to Add.cmp,
