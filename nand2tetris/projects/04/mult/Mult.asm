@@ -43,6 +43,7 @@
     D;JGT
     @LOOP_R0
     D;JLE
+    // you can see the value of this ^ smart looping here: https://nextjournal.com/a/Py1TkPYEvgYQ21XLtCY7w/edit#
 
 (LOOP_R0)
     // i++
