@@ -31,7 +31,47 @@
     D=M
     @END
     D;JEQ
-(LOOP)
+
+    // check to see which value we should loop over...
+    // b/c looping is a relatively expensive operation relative to adding, we want to loop as little as possible...
+    // so we loop on the smaller of R0 or R1
+    @0
+    D=M
+    @1
+    D=D-M
+    @LOOP_R1
+    D;JGT
+    @LOOP_R0
+    D;JLE
+
+(LOOP_R0)
+    // i++
+    @i
+    M=M+1
+
+    // D = R1
+    @1
+    D=M
+
+    // R2 += D
+    @2
+    M=M+D
+
+    // D = R0
+    @0
+    D=M
+
+    // D -= i
+    @i
+    D=D-M
+
+    // end if i == R0
+    @END
+    D;JEQ
+    // otherwise, continue looping
+    @LOOP_R0
+    0;JMP
+(LOOP_R1)
     // i++
     @i
     M=M+1
@@ -56,7 +96,7 @@
     @END
     D;JEQ
     // otherwise, continue looping
-    @LOOP
+    @LOOP_R1
     0;JMP
 (END)
     // infinite loop to signal end of program
