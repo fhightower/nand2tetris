@@ -45,6 +45,9 @@
     D;JLE
     // you can see the value of this ^ smart looping here: https://nextjournal.com/a/Py1TkPYEvgYQ21XLtCY7w/edit#
 
+// todo: To remove the need for two loops,...
+// I could generalize the looping functionality below or switch r0 and r1 so that the lower number is always in r0...
+// and we always iterate over r0
 (LOOP_R0)
     // i++
     @i

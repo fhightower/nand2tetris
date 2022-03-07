@@ -11,4 +11,44 @@
 // "white" in every pixel;
 // the screen should remain fully clear as long as no key is pressed.
 
-// Put your code here.
+(LISTENER)
+    @KBD
+    D=M
+
+    // fill screen
+    @FILL_SCREEN
+    D;JGT
+    // otherwise, uncolor the screen
+    @UNFILL_SCREEN
+    0;JMP
+(END)
+
+(FILL_SCREEN)
+    // put the value we want to write to the screen in R0
+    @0
+    M=1
+
+    @COLOR_SCREEN
+    0;JMP
+(END)
+
+(UNFILL_SCREEN)
+    // put the value we want to write to the screen in R0
+    @0
+    M=0
+
+    @COLOR_SCREEN
+    0;JMP
+(END)
+
+(COLOR_SCREEN)
+    // write the value of R0 to the screen
+    @0
+    D=M
+
+    @SCREEN
+    M=D
+
+    @LISTENER
+    0;JMP
+(END)
