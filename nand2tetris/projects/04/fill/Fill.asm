@@ -25,7 +25,7 @@
 
 (FILL_SCREEN)
     // put the value we want to write to the screen in R0
-    @0
+    @pixel
     M=1
 
     @COLOR_SCREEN
@@ -34,7 +34,7 @@
 
 (UNFILL_SCREEN)
     // put the value we want to write to the screen in R0
-    @0
+    @pixel
     M=0
 
     @COLOR_SCREEN
@@ -42,12 +42,31 @@
 (END)
 
 (COLOR_SCREEN)
-    // write the value of R0 to the screen
-    @0
-    D=M
-
-    @SCREEN
+    @16384
+    D=A
+    @loc
     M=D
+
+    (FILL_PIXEL)
+        // D = pixel
+        @pixel
+        D=M
+
+        @loc
+        A=M
+        M=D
+
+        @loc
+        M=M+1
+        D=M
+
+        @16414
+        D=D-A
+
+        // keep drawing if i - 255 is < zero
+        @FILL_PIXEL
+        D;JLT
+    (END)
 
     @LISTENER
     0;JMP
