@@ -11,6 +11,15 @@
 // "white" in every pixel;
 // the screen should remain fully clear as long as no key is pressed.
 
+// the max screen size is: 16384 + (32 * 256)
+// where 16384 is the starting address of the screen,
+// 32 is the number of words per row,
+// and 256 is the number of rows (so 32 * 256 finds the total number of words on the screen)
+@24576
+D=A
+@SCREEN_MAX
+M=D
+
 (LISTENER)
     @KBD
     D=M
@@ -24,9 +33,8 @@
 (END)
 
 (FILL_SCREEN)
-    // put the value we want to write to the screen in R0
     @pixel
-    M=1
+    M=-1
 
     @COLOR_SCREEN
     0;JMP
@@ -42,7 +50,7 @@
 (END)
 
 (COLOR_SCREEN)
-    @16384
+    @SCREEN
     D=A
     @loc
     M=D
@@ -60,8 +68,8 @@
         M=M+1
         D=M
 
-        @16414
-        D=D-A
+        @SCREEN_MAX
+        D=D-M
 
         // keep drawing if i - 255 is < zero
         @FILL_PIXEL
