@@ -52,11 +52,11 @@ M=D
 (COLOR_SCREEN)
     @SCREEN
     D=A
+    // define "loc" which will keep track of the current word on the screen
     @loc
     M=D
 
     (FILL_PIXEL)
-        // D = pixel
         @pixel
         D=M
 
