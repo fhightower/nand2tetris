@@ -39,5 +39,10 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    // use the "a" bit to determine if we are using the value of a or what is stored at it's memory loc...
+    // (which we would have gotten from the alu last clock cycle)
+    Mux(a=instruction, b=aluOut, sel=instruction[12], out=mux1Out);
+    // instruction[5] is the first bit of the "dest" section of the instruction, noting whether the item should be stored in register A
+    AARegister(in=mux1Out, load=instruction[5])
+
 }
