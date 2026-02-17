@@ -24,11 +24,24 @@ CHIP CPU {
     And(a=isCInstruction, b=instruction[4], out=shouldUpdateD);
     DRegister(in=aluOut, load=shouldUpdateD, out=d);
 
-    ALU(x=d, y=aOrM, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluOut, out=outM, zr=aluZr, ng=aluNg);
+    ALU(x=d, y=aOrM, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluOut, out=outM, zr=aluZr, ng=aluNeg);
 
-    Or(a=instruction[0], b=instruction[1], out=shouldJumpTmp1);
-    Or(a=shouldJumpTmp1, b=instruction[2], out=shouldJump2);
+    // pc
+    Not(in=aluZr, out=notZero);
+    Not(in=aluNeg, out=notNeg);
+    And(a=notZero, b=notNeg, out=aluPos);
+
+    And(a=instruction[0], b=aluPos, out=jumpPos);
+    And(a=instruction[1], b=aluZr, out=jumpZero);
+    And(a=instruction[2], b=aluNeg, out=jumpNeg);
+
+    Or(a=jumpPos, b=jumpZero, out=shouldJump1);
+    Or(a=shouldJump1, b=jumpNeg, out=shouldJump2);
     And(a=shouldJump2, b=isCInstruction, out=shouldJump);
+
     Not(in=shouldJump, out=increment);
     PC(in=aRegisterOut, load=shouldJump, inc=increment, reset=reset, out[0..14]=pc);
+
+    // writeM
+    And(a=isCInstruction, b=instruction[3], out=writeM);
 }
