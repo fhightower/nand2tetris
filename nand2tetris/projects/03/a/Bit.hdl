@@ -15,5 +15,6 @@ CHIP Bit {
 
     PARTS:
     Mux(a=lastOut, b=in, sel=load, out=muxOut);
+    // todo: implement DFF myself rather than using built-in version
     DFF(in=muxOut, out=lastOut, out=out);
 }

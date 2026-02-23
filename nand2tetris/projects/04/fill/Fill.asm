@@ -6,7 +6,7 @@
 // Runs an infinite loop that listens to the keyboard input.
 // When a key is pressed (any key), the program blackens the screen,
 // i.e. writes "black" in every pixel;
-// the screen should remain fully black as long as the key is pressed. 
+// the screen should remain fully black as long as the key is pressed.
 // When no key is pressed, the program clears the screen, i.e. writes
 // "white" in every pixel;
 // the screen should remain fully clear as long as no key is pressed.
@@ -30,7 +30,7 @@ M=D
     // otherwise, uncolor the screen
     @UNFILL_SCREEN
     0;JMP
-(END)
+(END_LISTENER)
 
 (FILL_SCREEN)
     @pixel
@@ -38,7 +38,7 @@ M=D
 
     @COLOR_SCREEN
     0;JMP
-(END)
+(END_FILL_SCREEN)
 
 (UNFILL_SCREEN)
     // put the value we want to write to the screen in R0
@@ -47,7 +47,7 @@ M=D
 
     @COLOR_SCREEN
     0;JMP
-(END)
+(END_UNFILL_SCREEN)
 
 (COLOR_SCREEN)
     @SCREEN
@@ -74,8 +74,8 @@ M=D
         // keep drawing if i - 255 is < zero
         @FILL_PIXEL
         D;JLT
-    (END)
+    (END_FILL_PIXEL)
 
     @LISTENER
     0;JMP
-(END)
+(END_COLOR_SCREEN)
