@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type BinaryCommand struct {
+type AsmCommand struct {
 	Raw string
 
 	IsACommand bool
@@ -20,16 +20,16 @@ type BinaryCommand struct {
 	Jump   string
 }
 
-func handleACommand(line string, bc BinaryCommand) BinaryCommand {
-	bc.IsACommand = true
-	bc.Symbol = line[1:]
-	return bc
+func handleACommand(line string, ac AsmCommand) AsmCommand {
+	ac.IsACommand = true
+	ac.Symbol = line[1:]
+	return ac
 }
 
-func handleLCommand(line string, bc BinaryCommand) BinaryCommand {
-	bc.IsLCommand = true
-	bc.Symbol = line[1 : len(line)-1]
-	return bc
+func handleLCommand(line string, ac AsmCommand) AsmCommand {
+	ac.IsLCommand = true
+	ac.Symbol = line[1 : len(line)-1]
+	return ac
 }
 
 // func findDest(line string) string {
@@ -81,31 +81,31 @@ func findJump(line string) string {
 	}
 }
 
-func handleCCommand(line string, bc BinaryCommand) BinaryCommand {
-	bc.IsCCommand = true
-	bc.Dest = findDest(line)
-	bc.Jump = findJump(line)
-	bc.Comp = findComp(line, bc.Dest, bc.Jump)
-	return bc
+func handleCCommand(line string, ac AsmCommand) AsmCommand {
+	ac.IsCCommand = true
+	ac.Dest = findDest(line)
+	ac.Jump = findJump(line)
+	ac.Comp = findComp(line, ac.Dest, ac.Jump)
+	return ac
 }
 
-func parseLine(line string) (BinaryCommand, error) {
-	bc := BinaryCommand{}
-	bc.Raw = line
+func parseLine(line string) (AsmCommand, error) {
+	ac := AsmCommand{}
+	ac.Raw = line
 
 	if strings.HasPrefix(line, "@") {
-		bc = handleACommand(line, bc)
+		ac = handleACommand(line, ac)
 	} else if strings.HasPrefix(line, "(") && strings.HasSuffix(line, ")") {
-		bc = handleLCommand(line, bc)
+		ac = handleLCommand(line, ac)
 	} else {
-		bc = handleCCommand(line, bc)
+		ac = handleCCommand(line, ac)
 	}
 
-	return bc, nil
+	return ac, nil
 }
 
-func Parse(r io.Reader) ([]BinaryCommand, error) {
-	var cmds []BinaryCommand
+func Parse(r io.Reader) ([]AsmCommand, error) {
+	var cmds []AsmCommand
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		text := scanner.Text()

@@ -23,6 +23,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	binaryStrings, err := parser.ConvertAsmToBinary(prog)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	_ = prog
 	// TODO: pass prog to assembler/codegen stage.
 }
