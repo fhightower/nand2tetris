@@ -28,6 +28,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_ = prog
+	_ = binaryStrings
 	// TODO: pass prog to assembler/codegen stage.
 }

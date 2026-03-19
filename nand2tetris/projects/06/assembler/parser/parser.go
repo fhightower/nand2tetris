@@ -2,8 +2,9 @@ package parser
 
 import (
 	"bufio"
-	"fmt"
 	"io"
+	"log"
+	"strconv"
 	"strings"
 )
 
@@ -14,48 +15,29 @@ type AsmCommand struct {
 	IsCCommand bool
 	IsLCommand bool
 
-	Symbol string
-	Dest   string
-	Comp   string
-	Jump   string
+	LSymbol string
+	ASymbol int
+	Dest    string
+	Comp    string
+	Jump    string
 }
 
 func handleACommand(line string, ac AsmCommand) AsmCommand {
 	ac.IsACommand = true
-	ac.Symbol = line[1:]
+	symbol, err := strconv.Atoi(line[1:])
+	if err != nil {
+		log.Fatal("invalid A-command value %q: %w", symbol, err)
+	}
+	ac.ASymbol = symbol
+
 	return ac
 }
 
 func handleLCommand(line string, ac AsmCommand) AsmCommand {
 	ac.IsLCommand = true
-	ac.Symbol = line[1 : len(line)-1]
+	ac.LSymbol = line[1 : len(line)-1]
 	return ac
 }
-
-// func findDest(line string) string {
-// 	i := strings.Index(line, "=")
-// 	if i == -1 {
-// 		return "000"
-// 	}
-// 	switch strings.TrimSpace(line[:i]) {
-// 	case "M":
-// 		return "001"
-// 	case "D":
-// 		return "010"
-// 	case "MD":
-// 		return "011"
-// 	case "A":
-// 		return "100"
-// 	case "AM":
-// 		return "101"
-// 	case "AD":
-// 		return "110"
-// 	case "AMD":
-// 		return "111"
-// 	}
-// 	// Unknown dest mnemonic; default to no dest.
-// 	return "000"
-// }
 
 func findDest(line string) string {
 	i := strings.Index(line, "=")
@@ -127,9 +109,6 @@ func Parse(r io.Reader) ([]AsmCommand, error) {
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, err
-	}
-	for i, cmd := range cmds {
-		fmt.Printf("%d: %+v\n", i, cmd)
 	}
 	return cmds, nil
 }
