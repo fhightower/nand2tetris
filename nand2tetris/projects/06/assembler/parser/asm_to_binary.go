@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+var symbolTable = map[string]int{}
+
 func convertComp(command AsmCommand) string {
 	switch command.Comp {
 	// a=0
@@ -117,7 +119,17 @@ func convertACommandToBinary(command AsmCommand) string {
 	return fmt.Sprintf("0%015b", command.ASymbol)
 }
 
+func symbolInSymbolTable(symbol string) bool {
+	_, exists := symbolTable[symbol]
+	return exists
+}
+
 func convertLCommandToBinary(command AsmCommand) string {
+	if symbolInSymbolTable(AsmCommand.LSymbol) {
+		// todo: start here...
+		return ""
+	}
+	// todo: start here...
 	return ""
 }
 
