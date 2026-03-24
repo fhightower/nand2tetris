@@ -125,11 +125,13 @@ func symbolInSymbolTable(symbol string) bool {
 }
 
 func convertLCommandToBinary(command AsmCommand) string {
-	if symbolInSymbolTable(AsmCommand.LSymbol) {
+	if symbolInSymbolTable(command.LSymbol) {
 		// todo: start here...
 		return ""
+	} else {
+		// todo: start here and fix the "1" on the line below
+		symbolTable[command.LSymbol] = 1
 	}
-	// todo: start here...
 	return ""
 }
 
