@@ -147,7 +147,7 @@ func convertACommandToBinary(command AsmCommand) string {
 	return fmt.Sprintf("0%015b", command.ASymbol)
 }
 
-func symbolInSymbolTable(symbol string) (int, bool) {
+func GetSymbolMemoryLoc(symbol string) (int, bool) {
 	value, exists := symbolTable[symbol]
 	return value, exists
 }
@@ -168,19 +168,18 @@ func findNextAvailableMemLocation() (int, error) {
 }
 
 func convertLCommandToBinary(command AsmCommand) string {
-	// todo: start here...
-	symbol, exists := symbolInSymbolTable(command.LSymbol)
-	if exists {
-		// todo: use symbol appropriately here...
-		return ""
-	} else {
+	memoryLoc, exists := GetSymbolMemoryLoc(command.LSymbol)
+	if !exists {
 		nextLoc, err := findNextAvailableMemLocation()
 		if err != nil {
 			panic("no available memory location")
 		}
 		symbolTable[command.LSymbol] = nextLoc
+		memoryLoc = nextLoc
 	}
-	return ""
+
+	// todo: start here...
+	return fmt.Sprintf("0%015b", memoryLoc)
 }
 
 func convertCommandToBinary(command AsmCommand) (string, error) {

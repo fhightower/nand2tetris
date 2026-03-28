@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"strconv"
@@ -23,10 +24,16 @@ type AsmCommand struct {
 }
 
 func handleACommand(line string, ac AsmCommand) AsmCommand {
+	// todo: start here and handle a commands that ref symbols
+	fmt.Printf("Handling %s\n", line)
 	ac.IsACommand = true
 	symbol, err := strconv.Atoi(line[1:])
 	if err != nil {
-		log.Fatal("invalid A-command value %q: %w", symbol, err)
+		memoryLoc, exists := GetSymbolMemoryLoc(line[1:])
+		if !exists {
+			log.Fatalf("invalid A-command value %q: %w", symbol, err)
+		}
+		symbol = memoryLoc
 	}
 	ac.ASymbol = symbol
 
