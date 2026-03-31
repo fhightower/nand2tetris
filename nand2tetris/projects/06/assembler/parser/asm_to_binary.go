@@ -1,38 +1,9 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
+	"log"
 )
-
-const startOfFreeMemory = 16
-const screenMemoryLoc = 16384
-
-var symbolTable = map[string]int{
-	"SP":     0,
-	"LCL":    1,
-	"ARG":    2,
-	"THIS":   3,
-	"THAT":   4,
-	"R0":     0,
-	"R1":     1,
-	"R2":     2,
-	"R3":     3,
-	"R4":     4,
-	"R5":     5,
-	"R6":     6,
-	"R7":     7,
-	"R8":     8,
-	"R9":     9,
-	"R10":    10,
-	"R11":    11,
-	"R12":    12,
-	"R13":    13,
-	"R14":    14,
-	"R15":    15,
-	"SCREEN": screenMemoryLoc,
-	"KBD":    24576,
-}
 
 func convertComp(command AsmCommand) string {
 	switch command.Comp {
@@ -147,38 +118,11 @@ func convertACommandToBinary(command AsmCommand) string {
 	return fmt.Sprintf("0%015b", command.ASymbol)
 }
 
-func GetSymbolMemoryLoc(symbol string) (int, bool) {
-	value, exists := symbolTable[symbol]
-	return value, exists
-}
-
-func findNextAvailableMemLocation() (int, error) {
-	used := make(map[int]bool)
-
-	for _, value := range symbolTable {
-		used[value] = true
-	}
-
-	for i := startOfFreeMemory; i < screenMemoryLoc; i++ {
-		if !used[i] {
-			return i, nil
-		}
-	}
-	return 0, errors.New("no available memory")
-}
-
 func convertLCommandToBinary(command AsmCommand) string {
 	memoryLoc, exists := GetSymbolMemoryLoc(command.LSymbol)
 	if !exists {
-		nextLoc, err := findNextAvailableMemLocation()
-		if err != nil {
-			panic("no available memory location")
-		}
-		symbolTable[command.LSymbol] = nextLoc
-		memoryLoc = nextLoc
+		log.Fatalf("Unable to find memory loc for %q", command.LSymbol)
 	}
-
-	// todo: start here...
 	return fmt.Sprintf("0%015b", memoryLoc)
 }
 
@@ -201,7 +145,6 @@ func ConvertAsmToBinary(asmCommands []AsmCommand) ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Printf("%+v\n", cmd)
 		fmt.Printf("%+v\n", newBinaryCommand)
 		binaryCommands = append(binaryCommands, newBinaryCommand)
 	}
