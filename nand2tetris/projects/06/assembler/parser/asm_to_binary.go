@@ -5,6 +5,13 @@ import (
 	"log"
 )
 
+func convertUsesM(command AsmCommand) string {
+	if command.UsesM {
+		return "1"
+	}
+	return "0"
+}
+
 func convertComp(command AsmCommand) string {
 	switch command.Comp {
 	// a=0
@@ -111,7 +118,7 @@ func convertJump(command AsmCommand) string {
 }
 
 func convertCCommandToBinary(command AsmCommand) string {
-	return fmt.Sprintf("111%s%s%s", convertComp(command), convertDest(command), convertJump(command))
+	return fmt.Sprintf("111%s%s%s%s", convertUsesM(command), convertComp(command), convertDest(command), convertJump(command))
 }
 
 func convertACommandToBinary(command AsmCommand) string {
@@ -141,7 +148,9 @@ func convertCommandToBinary(command AsmCommand) (string, error) {
 func ConvertAsmToBinary(asmCommands []AsmCommand) ([]string, error) {
 	var binaryCommands []string
 	for _, cmd := range asmCommands {
+		fmt.Printf("cmd: %q\n", cmd)
 		newBinaryCommand, err := convertCommandToBinary(cmd)
+		fmt.Printf("newBinaryCommand: %q\n", newBinaryCommand)
 		if err != nil {
 			return nil, err
 		}

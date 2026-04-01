@@ -48,9 +48,10 @@ type AsmCommand struct {
 	LSymbol string
 	ASymbol int
 
-	Dest string
-	Comp string
-	Jump string
+	UsesM bool
+	Dest  string
+	Comp  string
+	Jump  string
 }
 
 func handleACommand(line string, ac AsmCommand) AsmCommand {
@@ -104,6 +105,9 @@ func handleCCommand(line string, ac AsmCommand) AsmCommand {
 	ac.Dest = findDest(line)
 	ac.Jump = findJump(line)
 	ac.Comp = findComp(line, ac.Dest, ac.Jump)
+	if strings.Contains(ac.Comp, "M") {
+		ac.UsesM = true
+	}
 	return ac
 }
 
