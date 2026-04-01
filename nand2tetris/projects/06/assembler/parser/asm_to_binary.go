@@ -148,9 +148,9 @@ func convertCommandToBinary(command AsmCommand) (string, error) {
 func ConvertAsmToBinary(asmCommands []AsmCommand) ([]string, error) {
 	var binaryCommands []string
 	for _, cmd := range asmCommands {
-		fmt.Printf("cmd: %q\n", cmd)
+		// fmt.Printf("cmd: %q\n", cmd)
 		newBinaryCommand, err := convertCommandToBinary(cmd)
-		fmt.Printf("newBinaryCommand: %q\n", newBinaryCommand)
+		// fmt.Printf("newBinaryCommand: %q\n", newBinaryCommand)
 		if err != nil {
 			return nil, err
 		}

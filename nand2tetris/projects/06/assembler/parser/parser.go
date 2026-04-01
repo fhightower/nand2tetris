@@ -185,6 +185,12 @@ func Parse(r io.Reader) ([]AsmCommand, error) {
 				symbolTable[relevantSymbol] = nextLoc
 			}
 		}
+
+		// L-commands only have to be stored in the symbol table - don't list out in the binary
+		if cmd.IsLCommand {
+			continue
+		}
+
 		cmd, err = parseLine(text)
 		if err != nil {
 			log.Fatalf("Unable to parse after pre-processing: %q", text)
