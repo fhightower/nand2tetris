@@ -150,9 +150,41 @@ func isASCIILetter(c byte) bool {
 	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
 }
 
-func Parse(r io.Reader) ([]AsmCommand, error) {
+func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
 	var cmds []AsmCommand
 	scanner := bufio.NewScanner(r)
+
+	lineCount := 0
+	// Scanning the text twice isn't the best/most efficient way to do this, but it works for now
+	// Populate symbol table
+	for scanner.Scan() {
+		// todo: trim text
+		text := scanner.Text()
+
+		// Skip comments and empty lines
+		if strings.HasPrefix(text, "//") || text == "" {
+			continue
+		}
+
+		// Handle in-line comments
+		parts := strings.SplitN(text, "//", 2)
+		text = strings.TrimSpace(parts[0])
+
+		// Again, this is duplicative and could be cleaned, but works for now
+		if strings.HasPrefix(text, "(") && strings.HasSuffix(text, ")") {
+			ac := AsmCommand{}
+			cmd := handleLCommand(text, ac)
+			_, exists := GetSymbolMemoryLoc(cmd.LSymbol)
+			if !exists {
+				symbolTable[cmd.LSymbol] = lineCount
+			}
+		} else {
+			lineCount += 1
+		}
+	}
+
+	r.Seek(0, io.SeekStart)
+	scanner = bufio.NewScanner(r)
 	// This may not be the best/most efficient way to do this, but it works for now
 	for scanner.Scan() {
 		text := scanner.Text()
@@ -169,21 +201,6 @@ func Parse(r io.Reader) ([]AsmCommand, error) {
 		cmd, err := parseLine(text)
 		if err != nil {
 			log.Fatalf("Unable to parse before pre-processing: %q", text)
-		}
-		aCommandHasSymbol := cmd.IsACommand && isASCIILetter(cmd.Raw[1])
-		if cmd.IsLCommand || aCommandHasSymbol {
-			relevantSymbol := cmd.LSymbol
-			if cmd.IsACommand {
-				relevantSymbol = cmd.Raw[1:]
-			}
-			_, exists := GetSymbolMemoryLoc(relevantSymbol)
-			if !exists {
-				nextLoc, err := findNextAvailableMemLocation()
-				if err != nil {
-					panic("no available memory location")
-				}
-				symbolTable[relevantSymbol] = nextLoc
-			}
 		}
 
 		// L-commands only have to be stored in the symbol table - don't list out in the binary
