@@ -158,7 +158,6 @@ func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
 	// Scanning the text twice isn't the best/most efficient way to do this, but it works for now
 	// Populate symbol table
 	for scanner.Scan() {
-		// todo: trim text
 		text := scanner.Text()
 
 		// Skip comments and empty lines
@@ -202,15 +201,9 @@ func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
 		if err != nil {
 			log.Fatalf("Unable to parse before pre-processing: %q", text)
 		}
-
 		// L-commands only have to be stored in the symbol table - don't list out in the binary
 		if cmd.IsLCommand {
 			continue
-		}
-
-		cmd, err = parseLine(text)
-		if err != nil {
-			log.Fatalf("Unable to parse after pre-processing: %q", text)
 		}
 		cmds = append(cmds, cmd)
 	}
