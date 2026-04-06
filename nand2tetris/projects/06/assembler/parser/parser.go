@@ -60,13 +60,17 @@ func handleACommand(line string, ac AsmCommand) AsmCommand {
 	if err != nil {
 		memoryLoc, exists := GetSymbolMemoryLoc(line[1:])
 		if !exists {
-			// log.Fatalf("Invalid A-command value %q", symbol)
+			memoryLoc, err := findNextAvailableMemLocation()
+			if err != nil {
+				log.Fatalf("Invalid A-command value for %q: %q", line, symbol)
+			}
+			ac.ASymbol = memoryLoc
 			return ac
 		}
-		symbol = memoryLoc
+		ac.ASymbol = memoryLoc
+		return ac
 	}
 	ac.ASymbol = symbol
-
 	return ac
 }
 
@@ -117,8 +121,6 @@ func parseLine(line string) (AsmCommand, error) {
 
 	if strings.HasPrefix(line, "@") {
 		ac = handleACommand(line, ac)
-	} else if strings.HasPrefix(line, "(") && strings.HasSuffix(line, ")") {
-		ac = handleLCommand(line, ac)
 	} else {
 		ac = handleCCommand(line, ac)
 	}
@@ -169,7 +171,6 @@ func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
 		parts := strings.SplitN(text, "//", 2)
 		text = strings.TrimSpace(parts[0])
 
-		// Again, this is duplicative and could be cleaned, but works for now
 		if strings.HasPrefix(text, "(") && strings.HasSuffix(text, ")") {
 			ac := AsmCommand{}
 			cmd := handleLCommand(text, ac)
@@ -182,9 +183,9 @@ func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
 		}
 	}
 
+	// Go back to the start and rescan
 	r.Seek(0, io.SeekStart)
 	scanner = bufio.NewScanner(r)
-	// This may not be the best/most efficient way to do this, but it works for now
 	for scanner.Scan() {
 		text := scanner.Text()
 
@@ -197,13 +198,14 @@ func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
 		parts := strings.SplitN(text, "//", 2)
 		text = strings.TrimSpace(parts[0])
 
+		// L-commands only have to be stored in the symbol table - don't list out in the binary
+		if strings.HasPrefix(text, "(") && strings.HasSuffix(text, ")") {
+			continue
+		}
+
 		cmd, err := parseLine(text)
 		if err != nil {
 			log.Fatalf("Unable to parse before pre-processing: %q", text)
-		}
-		// L-commands only have to be stored in the symbol table - don't list out in the binary
-		if cmd.IsLCommand {
-			continue
 		}
 		cmds = append(cmds, cmd)
 	}

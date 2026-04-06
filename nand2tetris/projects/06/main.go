@@ -29,5 +29,4 @@ func main() {
 	}
 
 	_ = binaryStrings
-	// TODO: pass prog to assembler/codegen stage.
 }
