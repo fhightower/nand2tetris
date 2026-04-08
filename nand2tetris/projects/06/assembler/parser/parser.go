@@ -11,32 +11,9 @@ import (
 
 const startOfFreeMemory = 16
 const screenMemoryLoc = 16384
+const maxMemoryLoc = 32767
 
-var symbolTable = map[string]int{
-	"SP":     0,
-	"LCL":    1,
-	"ARG":    2,
-	"THIS":   3,
-	"THAT":   4,
-	"R0":     0,
-	"R1":     1,
-	"R2":     2,
-	"R3":     3,
-	"R4":     4,
-	"R5":     5,
-	"R6":     6,
-	"R7":     7,
-	"R8":     8,
-	"R9":     9,
-	"R10":    10,
-	"R11":    11,
-	"R12":    12,
-	"R13":    13,
-	"R14":    14,
-	"R15":    15,
-	"SCREEN": screenMemoryLoc,
-	"KBD":    24576,
-}
+var symbolTable = map[string]int{}
 
 type AsmCommand struct {
 	Raw string
@@ -54,21 +31,31 @@ type AsmCommand struct {
 	Jump  string
 }
 
+func handleSymbolicACommand(line string, ac AsmCommand) AsmCommand {
+	memoryLoc, exists := GetSymbolMemoryLoc(line[1:])
+	if !exists {
+		memoryLoc, err := findNextAvailableMemLocation()
+		if err != nil {
+			log.Fatalf("No available memory for %q", line)
+		}
+		symbolTable[line[1:]] = memoryLoc
+		ac.ASymbol = memoryLoc
+		return ac
+	}
+	ac.ASymbol = memoryLoc
+	return ac
+
+}
+
 func handleACommand(line string, ac AsmCommand) AsmCommand {
 	ac.IsACommand = true
 	symbol, err := strconv.Atoi(line[1:])
 	if err != nil {
-		memoryLoc, exists := GetSymbolMemoryLoc(line[1:])
-		if !exists {
-			memoryLoc, err := findNextAvailableMemLocation()
-			if err != nil {
-				log.Fatalf("Invalid A-command value for %q: %q", line, symbol)
-			}
-			ac.ASymbol = memoryLoc
-			return ac
-		}
-		ac.ASymbol = memoryLoc
-		return ac
+		return handleSymbolicACommand(line, ac)
+	}
+
+	if symbol > maxMemoryLoc || symbol < 0 {
+		log.Fatalf("Memory location out of range for %q", line)
 	}
 	ac.ASymbol = symbol
 	return ac
@@ -148,11 +135,37 @@ func findNextAvailableMemLocation() (int, error) {
 	return 0, errors.New("no available memory")
 }
 
-func isASCIILetter(c byte) bool {
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+func resetSymbolTable() {
+	symbolTable = map[string]int{
+		"SP":     0,
+		"LCL":    1,
+		"ARG":    2,
+		"THIS":   3,
+		"THAT":   4,
+		"R0":     0,
+		"R1":     1,
+		"R2":     2,
+		"R3":     3,
+		"R4":     4,
+		"R5":     5,
+		"R6":     6,
+		"R7":     7,
+		"R8":     8,
+		"R9":     9,
+		"R10":    10,
+		"R11":    11,
+		"R12":    12,
+		"R13":    13,
+		"R14":    14,
+		"R15":    15,
+		"SCREEN": screenMemoryLoc,
+		"KBD":    24576,
+	}
 }
 
 func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
+	resetSymbolTable()
+
 	var cmds []AsmCommand
 	scanner := bufio.NewScanner(r)
 
@@ -160,7 +173,7 @@ func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
 	// Scanning the text twice isn't the best/most efficient way to do this, but it works for now
 	// Populate symbol table
 	for scanner.Scan() {
-		text := scanner.Text()
+		text := strings.TrimSpace(scanner.Text())
 
 		// Skip comments and empty lines
 		if strings.HasPrefix(text, "//") || text == "" {
@@ -187,7 +200,7 @@ func Parse(r io.ReadSeeker) ([]AsmCommand, error) {
 	r.Seek(0, io.SeekStart)
 	scanner = bufio.NewScanner(r)
 	for scanner.Scan() {
-		text := scanner.Text()
+		text := strings.TrimSpace(scanner.Text())
 
 		// Skip comments and empty lines
 		if strings.HasPrefix(text, "//") || text == "" {

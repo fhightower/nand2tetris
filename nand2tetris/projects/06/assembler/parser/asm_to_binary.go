@@ -73,6 +73,7 @@ func convertComp(command AsmCommand) string {
 	case "D|M":
 		return "010101"
 	}
+	log.Fatalf("Unable to convert comp for  %+v", command)
 	return ""
 }
 
@@ -93,7 +94,9 @@ func convertDest(command AsmCommand) string {
 	case "AMD":
 		return "111"
 	}
-	// Unknown dest mnemonic; default to no dest.
+	if command.Dest != "" {
+		log.Fatalf("Unable to convert dest for  %+v", command)
+	}
 	return "000"
 }
 
@@ -114,6 +117,9 @@ func convertJump(command AsmCommand) string {
 	case "JMP":
 		return "111"
 	}
+	if command.Jump != "" {
+		log.Fatalf("Unable to convert jump for  %+v", command)
+	}
 	return "000"
 }
 
@@ -125,21 +131,11 @@ func convertACommandToBinary(command AsmCommand) string {
 	return fmt.Sprintf("0%015b", command.ASymbol)
 }
 
-func convertLCommandToBinary(command AsmCommand) string {
-	memoryLoc, exists := GetSymbolMemoryLoc(command.LSymbol)
-	if !exists {
-		log.Fatalf("Unable to find memory loc for %q", command.LSymbol)
-	}
-	return fmt.Sprintf("0%015b", memoryLoc)
-}
-
 func convertCommandToBinary(command AsmCommand) (string, error) {
 	if command.IsCCommand {
 		return convertCCommandToBinary(command), nil
 	} else if command.IsACommand {
 		return convertACommandToBinary(command), nil
-	} else if command.IsLCommand {
-		return convertLCommandToBinary(command), nil
 	} else {
 		return "", fmt.Errorf("Command of unknown type: %v", command)
 	}
@@ -148,13 +144,10 @@ func convertCommandToBinary(command AsmCommand) (string, error) {
 func ConvertAsmToBinary(asmCommands []AsmCommand) ([]string, error) {
 	var binaryCommands []string
 	for _, cmd := range asmCommands {
-		// fmt.Printf("cmd: %q\n", cmd)
 		newBinaryCommand, err := convertCommandToBinary(cmd)
-		// fmt.Printf("newBinaryCommand: %q\n", newBinaryCommand)
 		if err != nil {
 			return nil, err
 		}
-		fmt.Printf("%+v\n", newBinaryCommand)
 		binaryCommands = append(binaryCommands, newBinaryCommand)
 	}
 	return binaryCommands, nil

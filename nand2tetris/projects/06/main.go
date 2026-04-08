@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"projects06/assembler/parser"
 )
@@ -12,7 +13,8 @@ func main() {
 		log.Fatal("usage: assembler <input.asm>")
 	}
 
-	f, err := os.Open(os.Args[1])
+	fileName := os.Args[1]
+	f, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,5 +30,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_ = binaryStrings
+	hackFileName := strings.Replace(fileName, ".asm", ".hack", 1)
+	outputFile, err := os.Create(hackFileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer outputFile.Close()
+
+	for _, line := range binaryStrings {
+		outputFile.WriteString(line + "\n")
+	}
 }
