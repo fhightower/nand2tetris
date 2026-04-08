@@ -37,7 +37,5 @@ func main() {
 	}
 	defer outputFile.Close()
 
-	for _, line := range binaryStrings {
-		outputFile.WriteString(line + "\n")
-	}
+	outputFile.WriteString(strings.Join(binaryStrings, "\n"))
 }

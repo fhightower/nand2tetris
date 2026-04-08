@@ -2,7 +2,7 @@ package parser
 
 import (
 	"bufio"
-	"errors"
+	"fmt"
 	"io"
 	"log"
 	"strconv"
@@ -14,6 +14,7 @@ const screenMemoryLoc = 16384
 const maxMemoryLoc = 32767
 
 var symbolTable = map[string]int{}
+var nextFreeAddress = startOfFreeMemory
 
 type AsmCommand struct {
 	Raw string
@@ -121,21 +122,16 @@ func GetSymbolMemoryLoc(symbol string) (int, bool) {
 }
 
 func findNextAvailableMemLocation() (int, error) {
-	used := make(map[int]bool)
-
-	for _, value := range symbolTable {
-		used[value] = true
+	if nextFreeAddress >= screenMemoryLoc {
+		return 0, fmt.Errorf("no available memory")
 	}
-
-	for i := startOfFreeMemory; i < screenMemoryLoc; i++ {
-		if !used[i] {
-			return i, nil
-		}
-	}
-	return 0, errors.New("no available memory")
+	addr := nextFreeAddress
+	nextFreeAddress++
+	return addr, nil
 }
 
 func resetSymbolTable() {
+	nextFreeAddress = startOfFreeMemory
 	symbolTable = map[string]int{
 		"SP":     0,
 		"LCL":    1,
