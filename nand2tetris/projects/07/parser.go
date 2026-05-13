@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
+	"log"
 	"strings"
 )
 
@@ -31,10 +31,37 @@ type VmCommand struct {
 	Arg2 int
 }
 
+func determineTypeFromOperation(operation string) string {
+	switch operation {
+
+	case "push":
+		return C_PUSH
+	case "pop":
+		return C_POP
+	// todo: start here and expand this case
+	case "add", "sub":
+		return C_ARITHMETIC
+		// todo: start here and add more cases
+		// C_LABEL      CommandType = "C_LABEL"
+		// C_GOTO       CommandType = "C_GOTO"
+		// C_IF         CommandType = "C_IF"
+		// C_FUNCTION   CommandType = "C_FUNCTION"
+		// C_RETURN     CommandType = "C_RETURN"
+		// C_CALL       CommandType = "C_CALL"
+	}
+	log.Fatalf("Unable to determine type for %+v", operation)
+	return ""
+}
+
 func parseCommand(rawCommand string) (VmCommand, error) {
 	vc := VmCommand{}
+	vc.Raw = rawCommand
 
-	// todo: start here: update parsing logic
+	elements := strings.Split(rawCommand, " ")
+	operation := elements[0]
+	vc.Type = determineTypeFromOperation(operation)
+
+	// todo: continue updating parsing logic
 	return vc, nil
 }
 
@@ -63,6 +90,5 @@ func ParseFile(r io.ReadSeeker) ([]VmCommand, error) {
 
 	}
 
-	fmt.Println(len(cmds))
 	return cmds, nil
 }
