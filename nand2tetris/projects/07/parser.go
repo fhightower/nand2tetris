@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -31,8 +32,10 @@ type VmCommand struct {
 }
 
 func parseCommand(rawCommand string) (VmCommand, error) {
+	vc := VmCommand{}
+
 	// todo: start here: update parsing logic
-	return nil, nil
+	return vc, nil
 }
 
 func ParseFile(r io.ReadSeeker) ([]VmCommand, error) {
@@ -49,15 +52,17 @@ func ParseFile(r io.ReadSeeker) ([]VmCommand, error) {
 
 		// Handle in-line comments
 		parts := strings.SplitN(line, "//", 2)
-		rawCommand = strings.TrimSpace(parts[0])
+		rawCommand := strings.TrimSpace(parts[0])
 
 		vmCommand, err := parseCommand(rawCommand)
 
 		if err != nil {
 			return cmds, nil
 		}
+		cmds = append(cmds, vmCommand)
 
 	}
 
+	fmt.Println(len(cmds))
 	return cmds, nil
 }
