@@ -4,7 +4,21 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
+
+// todo(later): handle directory input
+func writeAssembly(fileName string, assembly []string) error {
+	assemblyFileName := strings.Replace(fileName, ".vm", ".asm", 1)
+	outputFile, err := os.Create(assemblyFileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer outputFile.Close()
+
+	outputFile.WriteString(strings.Join(assembly, "\n"))
+	return nil
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -25,5 +39,14 @@ func main() {
 	}
 	fmt.Println(prog)
 
-	// todo: generate output file
+	assembly, err := GenerateAssembly(prog)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(assembly)
+
+	err = writeAssembly(fileName, assembly)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
