@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -31,23 +32,27 @@ type VmCommand struct {
 	Arg2 int
 }
 
-func determineTypeFromOperation(operation string) string {
+func determineTypeFromOperation(operation string) CommandType {
 	switch operation {
 
 	case "push":
 		return C_PUSH
 	case "pop":
 		return C_POP
-	// todo: start here and expand this case
-	case "add", "sub":
+	case "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not":
 		return C_ARITHMETIC
-		// todo: start here and add more cases
-		// C_LABEL      CommandType = "C_LABEL"
-		// C_GOTO       CommandType = "C_GOTO"
-		// C_IF         CommandType = "C_IF"
-		// C_FUNCTION   CommandType = "C_FUNCTION"
-		// C_RETURN     CommandType = "C_RETURN"
-		// C_CALL       CommandType = "C_CALL"
+	case "label":
+		return C_LABEL
+	case "goto":
+		return C_GOTO
+	case "if-goto":
+		return C_IF
+	case "function":
+		return C_FUNCTION
+	case "call":
+		return C_CALL
+	case "return":
+		return C_RETURN
 	}
 	log.Fatalf("Unable to determine type for %+v", operation)
 	return ""
@@ -61,7 +66,21 @@ func parseCommand(rawCommand string) (VmCommand, error) {
 	operation := elements[0]
 	vc.Type = determineTypeFromOperation(operation)
 
-	// todo: continue updating parsing logic
+	if vc.Type == C_RETURN {
+		return vc, nil
+	} else if vc.Type == C_ARITHMETIC {
+		vc.Arg1 = operation
+	} else {
+		vc.Arg1 = elements[1]
+	}
+
+	if len(elements) == 3 {
+		n, err := strconv.Atoi(elements[2])
+		if err != nil {
+			return vc, err
+		}
+		vc.Arg2 = n
+	}
 	return vc, nil
 }
 
