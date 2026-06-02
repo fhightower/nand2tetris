@@ -12,7 +12,21 @@ func handleArithmeticCommand(cmd VmCommand) ([]string, error) {
 			"AM=M-1", // SP--, A = address of top value (y)
 			"D=M",    // D = y
 			"A=A-1",  // A = address of next value (x)
-			"M=D+M",  // x = y + x
+			"M=M+D",  // x = x + y
+		}, nil
+	case "sub":
+		return []string{
+			"@SP",
+			"AM=M-1",
+			"D=M",
+			"A=A-1",
+			"M=M-D",
+		}, nil
+	case "neg":
+		return []string{
+			"@SP",
+			"A=M-1",
+			"M=-M",
 		}, nil
 		// todo: start here and build this case statement out
 	}
