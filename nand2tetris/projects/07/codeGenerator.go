@@ -4,6 +4,36 @@ import (
 	"fmt"
 )
 
+// comparison emits asm for eq/gt/lt. jump is the conditional jump on D
+// after computing x-y (e.g. "D;JEQ"). Pushes -1 (true) or 0 (false).
+func comparison(jump string, labelCounter int) []string {
+	trueLabel := fmt.Sprintf("TRUE_%d", labelCounter)
+	endLabel := fmt.Sprintf("END_%d", labelCounter)
+
+	return []string{
+		"@SP",
+		"AM=M-1",
+		"D=M",
+		"A=A-1",
+		"D=M-D",
+		// this ^ is subtraction
+		fmt.Sprintf("@%s", trueLabel),
+		jump,
+		// False path:
+		"@SP",
+		"A=M-1",
+		"M=0",
+		fmt.Sprintf("@%s", endLabel),
+		"0;JMP",
+		// True path:
+		fmt.Sprintf("(%s)", trueLabel),
+		"@SP",
+		"A=M-1",
+		"M=-1",
+		fmt.Sprintf("(%s)", endLabel),
+	}
+}
+
 func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, error) {
 	switch cmd.Arg1 {
 	case "add":
@@ -29,59 +59,11 @@ func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, er
 			"M=-M",
 		}, labelCounter, nil
 	case "eq":
-		trueLabel := fmt.Sprintf("TRUE_%d", labelCounter)
-		endLabel := fmt.Sprintf("END_%d", labelCounter)
-
-		result := []string{
-			"@SP",
-			"AM=M-1",
-			"D=M",
-			"A=A-1",
-			"D=M-D",
-			// this ^ is subtraction
-			fmt.Sprintf("@%s", trueLabel),
-			"D;JEQ",
-			// False path:
-			"@SP",
-			"A=M-1",
-			"M=0",
-			fmt.Sprintf("@%s", endLabel),
-			"0;JMP",
-			// True path:
-			fmt.Sprintf("(%s)", trueLabel),
-			"@SP",
-			"A=M-1",
-			"M=-1",
-			fmt.Sprintf("(%s)", endLabel),
-		}
-		return result, labelCounter + 1, nil
+		return comparison("D;JEQ", labelCounter), labelCounter + 1, nil
 	case "gt":
-		trueLabel := fmt.Sprintf("TRUE_%d", labelCounter)
-		endLabel := fmt.Sprintf("END_%d", labelCounter)
-
-		result := []string{
-			"@SP",
-			"AM=M-1",
-			"D=M",
-			"A=A-1",
-			"D=M-D",
-			// this ^ is subtraction
-			fmt.Sprintf("@%s", trueLabel),
-			"D;JGT",
-			// False path:
-			"@SP",
-			"A=M-1",
-			"M=0",
-			fmt.Sprintf("@%s", endLabel),
-			"0;JMP",
-			// True path:
-			fmt.Sprintf("(%s)", trueLabel),
-			"@SP",
-			"A=M-1",
-			"M=-1",
-			fmt.Sprintf("(%s)", endLabel),
-		}
-		return result, labelCounter + 1, nil
+		return comparison("D;JGT", labelCounter), labelCounter + 1, nil
+	case "lt":
+		return comparison("D;JLT", labelCounter), labelCounter + 1, nil
 		// todo: start here and build this case statement out
 	}
 	return nil, labelCounter, fmt.Errorf("unsupported arithmetic command: %s", cmd.Arg1)
