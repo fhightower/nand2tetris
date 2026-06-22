@@ -64,6 +64,14 @@ func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, er
 		return comparison("D;JGT", labelCounter), labelCounter + 1, nil
 	case "lt":
 		return comparison("D;JLT", labelCounter), labelCounter + 1, nil
+	case "and":
+		return []string{
+			"@SP",
+			"AM=M-1",
+			"D=M",
+			"A=A-1",
+			"M=M&D",
+		}, labelCounter, nil
 		// todo: start here and build this case statement out
 	}
 	return nil, labelCounter, fmt.Errorf("unsupported arithmetic command: %s", cmd.Arg1)
