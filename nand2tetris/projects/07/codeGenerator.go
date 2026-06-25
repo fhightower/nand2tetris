@@ -72,7 +72,20 @@ func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, er
 			"A=A-1",
 			"M=M&D",
 		}, labelCounter, nil
-		// todo: start here and build this case statement out
+	case "or":
+		return []string{
+			"@SP",
+			"AM=M-1",
+			"D=M",
+			"A=A-1",
+			"M=M|D",
+		}, labelCounter, nil
+	case "not":
+		return []string{
+			"@SP",
+			"A=M-1",
+			"M=!M",
+		}, labelCounter, nil
 	}
 	return nil, labelCounter, fmt.Errorf("unsupported arithmetic command: %s", cmd.Arg1)
 }
