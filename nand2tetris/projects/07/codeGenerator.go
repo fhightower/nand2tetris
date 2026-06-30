@@ -90,6 +90,22 @@ func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, er
 	return nil, labelCounter, fmt.Errorf("unsupported arithmetic command: %s", cmd.Arg1)
 }
 
+func handlePushCommand(cmd VmCommand) ([]string, error) {
+	switch cmd.Arg1 {
+	case "constant":
+		return []string{
+			fmt.Sprintf("@%d", cmd.Arg2),
+			"D=A", // D = constant
+			"@SP",
+			"A=M", // A = top of stack
+			"M=D", // *SP = constant
+			"@SP",
+			"M=M+1", // SP++
+		}, nil
+	}
+	return nil, fmt.Errorf("unsupported push segment: %s", cmd.Arg1)
+}
+
 func GenerateAssembly(cmds []VmCommand) ([]string, error) {
 	var assembly []string
 	labelCounter := 0
@@ -100,6 +116,12 @@ func GenerateAssembly(cmds []VmCommand) ([]string, error) {
 		case C_ARITHMETIC:
 			lines, newLabelCounter, err := handleArithmeticCommand(cmd, labelCounter)
 			labelCounter = newLabelCounter
+			if err != nil {
+				return assembly, err
+			}
+			assembly = append(assembly, lines...)
+		case C_PUSH:
+			lines, err := handlePushCommand(cmd)
 			if err != nil {
 				return assembly, err
 			}
