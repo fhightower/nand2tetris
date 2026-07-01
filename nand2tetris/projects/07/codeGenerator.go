@@ -90,18 +90,57 @@ func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, er
 	return nil, labelCounter, fmt.Errorf("unsupported arithmetic command: %s", cmd.Arg1)
 }
 
+// pushD emits asm that pushes the value in D onto the stack and bumps SP.
+var pushD = []string{
+	"@SP",
+	"A=M", // A = top of stack
+	"M=D", // *SP = D
+	"@SP",
+	"M=M+1", // SP++
+}
+
+// pointerSegments maps a VM segment name to its base-pointer symbol.
+// These segments are indirect: base held in RAM, address = *base + i.
+var pointerSegments = map[string]string{
+	"local":    "LCL",
+	"argument": "ARG",
+	"this":     "THIS",
+	"that":     "THAT",
+}
+
 func handlePushCommand(cmd VmCommand) ([]string, error) {
+	if base, ok := pointerSegments[cmd.Arg1]; ok {
+		lines := []string{
+			fmt.Sprintf("@%d", cmd.Arg2),
+			"D=A", // D = i
+			fmt.Sprintf("@%s", base),
+			"A=M+D", // A = base + i
+			"D=M",   // D = *(base + i)
+		}
+		return append(lines, pushD...), nil
+	}
+
 	switch cmd.Arg1 {
 	case "constant":
-		return []string{
+		lines := []string{
 			fmt.Sprintf("@%d", cmd.Arg2),
 			"D=A", // D = constant
-			"@SP",
-			"A=M", // A = top of stack
-			"M=D", // *SP = constant
-			"@SP",
-			"M=M+1", // SP++
-		}, nil
+		}
+		return append(lines, pushD...), nil
+	case "temp":
+		// temp is a fixed 8-slot region at RAM[5..12]; address = 5 + i (direct).
+		lines := []string{
+			fmt.Sprintf("@%d", 5+cmd.Arg2),
+			"D=M", // D = RAM[5 + i]
+		}
+		return append(lines, pushD...), nil
+	case "pointer":
+		// pointer 0 -> THIS (RAM[3]), pointer 1 -> THAT (RAM[4]); direct.
+		lines := []string{
+			fmt.Sprintf("@%d", 3+cmd.Arg2),
+			"D=M", // D = THIS/THAT
+		}
+		return append(lines, pushD...), nil
 	}
 	return nil, fmt.Errorf("unsupported push segment: %s", cmd.Arg1)
 }
