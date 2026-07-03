@@ -2,7 +2,16 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
 )
+
+// staticBase turns a .vm path into the base name used for static symbols,
+// e.g. "dir/BasicTest.vm" -> "BasicTest".
+func staticBase(fileName string) string {
+	base := filepath.Base(fileName)
+	return strings.TrimSuffix(base, ".vm")
+}
 
 // comparison emits asm for eq/gt/lt. jump is the conditional jump on D
 // after computing x-y (e.g. "D;JEQ"). Pushes -1 (true) or 0 (false).
@@ -108,7 +117,7 @@ var pointerSegments = map[string]string{
 	"that":     "THAT",
 }
 
-func handlePushCommand(cmd VmCommand) ([]string, error) {
+func handlePushCommand(cmd VmCommand, fileName string) ([]string, error) {
 	if base, ok := pointerSegments[cmd.Arg1]; ok {
 		lines := []string{
 			fmt.Sprintf("@%d", cmd.Arg2),
@@ -141,11 +150,18 @@ func handlePushCommand(cmd VmCommand) ([]string, error) {
 			"D=M", // D = THIS/THAT
 		}
 		return append(lines, pushD...), nil
+	case "static":
+		// static i -> unique symbol @<file>.i, one RAM slot per (file, i).
+		lines := []string{
+			fmt.Sprintf("@%s.%d", staticBase(fileName), cmd.Arg2),
+			"D=M", // D = static var
+		}
+		return append(lines, pushD...), nil
 	}
 	return nil, fmt.Errorf("unsupported push segment: %s", cmd.Arg1)
 }
 
-func GenerateAssembly(cmds []VmCommand) ([]string, error) {
+func GenerateAssembly(cmds []VmCommand, fileName string) ([]string, error) {
 	var assembly []string
 	labelCounter := 0
 
@@ -160,7 +176,7 @@ func GenerateAssembly(cmds []VmCommand) ([]string, error) {
 			}
 			assembly = append(assembly, lines...)
 		case C_PUSH:
-			lines, err := handlePushCommand(cmd)
+			lines, err := handlePushCommand(cmd, fileName)
 			if err != nil {
 				return assembly, err
 			}

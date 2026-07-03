@@ -39,7 +39,7 @@ func main() {
 	}
 	fmt.Println(prog)
 
-	assembly, err := GenerateAssembly(prog)
+	assembly, err := GenerateAssembly(prog, fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
