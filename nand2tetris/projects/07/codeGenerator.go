@@ -161,6 +161,50 @@ func handlePushCommand(cmd VmCommand, fileName string) ([]string, error) {
 	return nil, fmt.Errorf("unsupported push segment: %s", cmd.Arg1)
 }
 
+func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
+	// todo: implement
+	// if base, ok := pointerSegments[cmd.Arg1]; ok {
+	// 	lines := []string{
+	// 		fmt.Sprintf("@%d", cmd.Arg2),
+	// 		"D=A", // D = i
+	// 		fmt.Sprintf("@%s", base),
+	// 		"A=M+D", // A = base + i
+	// 		"D=M",   // D = *(base + i)
+	// 	}
+	// 	return append(lines, pushD...), nil
+	// }
+
+	switch cmd.Arg1 {
+	case "temp":
+		// temp is a fixed 8-slot region at RAM[5..12]; address = 5 + i (direct).
+		lines := []string{
+			"@SP",
+			"AM=M-1", // SP--, A = address of top value on stack
+			"D=M",    // D = top value on stack
+			fmt.Sprintf("@%d", 5+cmd.Arg2),
+			"M=D", // RAM[5 + i] = D (top of stack)
+		}
+		return lines, nil
+	}
+	// todo: implement
+	// case "pointer":
+	// 	// pointer 0 -> THIS (RAM[3]), pointer 1 -> THAT (RAM[4]); direct.
+	// 	lines := []string{
+	// 		fmt.Sprintf("@%d", 3+cmd.Arg2),
+	// 		"D=M", // D = THIS/THAT
+	// 	}
+	// 	return append(lines, pushD...), nil
+	// case "static":
+	// 	// static i -> unique symbol @<file>.i, one RAM slot per (file, i).
+	// 	lines := []string{
+	// 		fmt.Sprintf("@%s.%d", staticBase(fileName), cmd.Arg2),
+	// 		"D=M", // D = static var
+	// 	}
+	// 	return append(lines, pushD...), nil
+	// }
+	return nil, fmt.Errorf("unsupported pop segment: %s", cmd.Arg1)
+}
+
 func GenerateAssembly(cmds []VmCommand, fileName string) ([]string, error) {
 	var assembly []string
 	labelCounter := 0
@@ -177,6 +221,12 @@ func GenerateAssembly(cmds []VmCommand, fileName string) ([]string, error) {
 			assembly = append(assembly, lines...)
 		case C_PUSH:
 			lines, err := handlePushCommand(cmd, fileName)
+			if err != nil {
+				return assembly, err
+			}
+			assembly = append(assembly, lines...)
+		case C_POP:
+			lines, err := handlePopCommand(cmd, fileName)
 			if err != nil {
 				return assembly, err
 			}
