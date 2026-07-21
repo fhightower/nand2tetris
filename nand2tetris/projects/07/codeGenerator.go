@@ -185,15 +185,18 @@ func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
 			"M=D", // RAM[5 + i] = D (top of stack)
 		}
 		return lines, nil
+	case "pointer":
+		// pointer 0 -> THIS (RAM[3]), pointer 1 -> THAT (RAM[4]); direct.
+		lines := []string{
+			"@SP",
+			"AM=M-1",
+			"D=M",
+			fmt.Sprintf("@%d", 3+cmd.Arg2),
+			"M=D",
+		}
+		return lines, nil
 	}
 	// todo: implement
-	// case "pointer":
-	// 	// pointer 0 -> THIS (RAM[3]), pointer 1 -> THAT (RAM[4]); direct.
-	// 	lines := []string{
-	// 		fmt.Sprintf("@%d", 3+cmd.Arg2),
-	// 		"D=M", // D = THIS/THAT
-	// 	}
-	// 	return append(lines, pushD...), nil
 	// case "static":
 	// 	// static i -> unique symbol @<file>.i, one RAM slot per (file, i).
 	// 	lines := []string{
