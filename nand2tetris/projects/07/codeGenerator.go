@@ -195,16 +195,17 @@ func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
 			"M=D",
 		}
 		return lines, nil
+	case "static":
+		// static i -> unique symbol @<file>.i, one RAM slot per (file, i).
+		lines := []string{
+			"@SP",
+			"AM=M-1",
+			"D=M",
+			fmt.Sprintf("@%s.%d", staticBase(fileName), cmd.Arg2),
+			"M=D",
+		}
+		return lines, nil
 	}
-	// todo: implement
-	// case "static":
-	// 	// static i -> unique symbol @<file>.i, one RAM slot per (file, i).
-	// 	lines := []string{
-	// 		fmt.Sprintf("@%s.%d", staticBase(fileName), cmd.Arg2),
-	// 		"D=M", // D = static var
-	// 	}
-	// 	return append(lines, pushD...), nil
-	// }
 	return nil, fmt.Errorf("unsupported pop segment: %s", cmd.Arg1)
 }
 
@@ -212,7 +213,7 @@ func GenerateAssembly(cmds []VmCommand, fileName string) ([]string, error) {
 	var assembly []string
 	labelCounter := 0
 
-	// todo: start here and write this function
+	// todo: implement
 	for _, cmd := range cmds {
 		switch cmd.Type {
 		case C_ARITHMETIC:
