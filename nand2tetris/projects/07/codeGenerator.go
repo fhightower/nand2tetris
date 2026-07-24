@@ -161,50 +161,28 @@ func handlePushCommand(cmd VmCommand, fileName string) ([]string, error) {
 	return nil, fmt.Errorf("unsupported push segment: %s", cmd.Arg1)
 }
 
-func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
-	// todo: implement
-	// if base, ok := pointerSegments[cmd.Arg1]; ok {
-	// 	lines := []string{
-	// 		fmt.Sprintf("@%d", cmd.Arg2),
-	// 		"D=A", // D = i
-	// 		fmt.Sprintf("@%s", base),
-	// 		"A=M+D", // A = base + i
-	// 		"D=M",   // D = *(base + i)
-	// 	}
-	// 	return append(lines, pushD...), nil
-	// }
+func genPopCommand(popDestination string) []string {
+	lines := []string{
+		"@SP",
+		"AM=M-1", // SP--, A = address of top value on stack
+		"D=M",    // D = top value on stack
+		fmt.Sprintf("@%s", popDestination),
+		"M=D", // RAM[popDestination] = D (top of stack)
+	}
+	return lines
+}
 
+func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
 	switch cmd.Arg1 {
 	case "temp":
 		// temp is a fixed 8-slot region at RAM[5..12]; address = 5 + i (direct).
-		lines := []string{
-			"@SP",
-			"AM=M-1", // SP--, A = address of top value on stack
-			"D=M",    // D = top value on stack
-			fmt.Sprintf("@%d", 5+cmd.Arg2),
-			"M=D", // RAM[5 + i] = D (top of stack)
-		}
-		return lines, nil
+		return genPopCommand(fmt.Sprintf("%d", 5+cmd.Arg2)), nil
 	case "pointer":
 		// pointer 0 -> THIS (RAM[3]), pointer 1 -> THAT (RAM[4]); direct.
-		lines := []string{
-			"@SP",
-			"AM=M-1",
-			"D=M",
-			fmt.Sprintf("@%d", 3+cmd.Arg2),
-			"M=D",
-		}
-		return lines, nil
+		return genPopCommand(fmt.Sprintf("%d", 3+cmd.Arg2)), nil
 	case "static":
 		// static i -> unique symbol @<file>.i, one RAM slot per (file, i).
-		lines := []string{
-			"@SP",
-			"AM=M-1",
-			"D=M",
-			fmt.Sprintf("@%s.%d", staticBase(fileName), cmd.Arg2),
-			"M=D",
-		}
-		return lines, nil
+		return genPopCommand(fmt.Sprintf("%s.%d", staticBase(fileName), cmd.Arg2)), nil
 	}
 	return nil, fmt.Errorf("unsupported pop segment: %s", cmd.Arg1)
 }
