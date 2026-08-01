@@ -161,7 +161,7 @@ func handlePushCommand(cmd VmCommand, fileName string) ([]string, error) {
 	return nil, fmt.Errorf("unsupported push segment: %s", cmd.Arg1)
 }
 
-func genPopCommand(popDestination string) []string {
+func genPopToAddress(popDestination string) []string {
 	lines := []string{
 		"@SP",
 		"AM=M-1", // SP--, A = address of top value on stack
@@ -176,13 +176,30 @@ func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
 	switch cmd.Arg1 {
 	case "temp":
 		// temp is a fixed 8-slot region at RAM[5..12]; address = 5 + i (direct).
-		return genPopCommand(fmt.Sprintf("%d", 5+cmd.Arg2)), nil
+		return genPopToAddress(fmt.Sprintf("%d", 5+cmd.Arg2)), nil
 	case "pointer":
 		// pointer 0 -> THIS (RAM[3]), pointer 1 -> THAT (RAM[4]); direct.
-		return genPopCommand(fmt.Sprintf("%d", 3+cmd.Arg2)), nil
+		return genPopToAddress(fmt.Sprintf("%d", 3+cmd.Arg2)), nil
 	case "static":
 		// static i -> unique symbol @<file>.i, one RAM slot per (file, i).
-		return genPopCommand(fmt.Sprintf("%s.%d", staticBase(fileName), cmd.Arg2)), nil
+		return genPopToAddress(fmt.Sprintf("%s.%d", staticBase(fileName), cmd.Arg2)), nil
+	case "local":
+		// local held in RAM[1]
+		lines := []string{
+			"@LCL",
+			"D=M",
+			fmt.Sprintf("@%d", cmd.Arg2),
+			"D=D+A",
+			"@R13",
+			"M=D",
+			"@SP",
+			"AM=M-1", // SP--, A = address of top value on stack
+			"D=M",
+			"@R13",
+			"A=M",
+			"M=D",
+		}
+		return lines, nil
 	}
 	return nil, fmt.Errorf("unsupported pop segment: %s", cmd.Arg1)
 }
