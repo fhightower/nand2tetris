@@ -173,7 +173,13 @@ func genPopToAddress(popDestination string) []string {
 }
 
 func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
+	// Note: there is intentionally no support for `constant` in the switch...
+	// statement below as you can't pop a constant
 	switch cmd.Arg1 {
+	// todo: add support for:
+	// case "argument":
+	// case "this":
+	// case "that":
 	case "temp":
 		// temp is a fixed 8-slot region at RAM[5..12]; address = 5 + i (direct).
 		return genPopToAddress(fmt.Sprintf("%d", 5+cmd.Arg2)), nil
