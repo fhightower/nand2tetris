@@ -176,8 +176,24 @@ func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
 	// Note: there is intentionally no support for `constant` in the switch...
 	// statement below as you can't pop a constant
 	switch cmd.Arg1 {
+	// todo: dedpulicate this w/ local and any others
+	case "argument":
+		lines := []string{
+			"@ARG",
+			"D=M",
+			fmt.Sprintf("@%d", cmd.Arg2),
+			"D=D+A",
+			"@R13",
+			"M=D",
+			"@SP",
+			"AM=M-1", // SP--, A = address of top value on stack
+			"D=M",
+			"@R13",
+			"A=M",
+			"M=D",
+		}
+		return lines, nil
 	// todo: add support for:
-	// case "argument":
 	// case "this":
 	// case "that":
 	case "temp":
