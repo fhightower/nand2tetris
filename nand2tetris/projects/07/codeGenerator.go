@@ -172,75 +172,39 @@ func genPopToAddress(popDestination string) []string {
 	return lines
 }
 
+func genPopToAddressWithAuxStorage(destination string, offset int) []string {
+	lines := []string{
+		fmt.Sprintf("@%s", destination),
+		"D=M",
+		fmt.Sprintf("@%d", offset),
+		"D=D+A",
+		"@R13",
+		"M=D",
+		"@SP",
+		"AM=M-1", // SP--, A = address of top value on stack
+		"D=M",
+		"@R13",
+		"A=M",
+		"M=D",
+	}
+	return lines
+}
+
 func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
 	// Note: there is intentionally no support for `constant` in the switch...
 	// statement below as you can't pop a constant
 	switch cmd.Arg1 {
-	// todo: dedpulicate this w/ local and any others
 	case "argument":
-		lines := []string{
-			"@ARG",
-			"D=M",
-			fmt.Sprintf("@%d", cmd.Arg2),
-			"D=D+A",
-			"@R13",
-			"M=D",
-			"@SP",
-			"AM=M-1", // SP--, A = address of top value on stack
-			"D=M",
-			"@R13",
-			"A=M",
-			"M=D",
-		}
+		lines := genPopToAddressWithAuxStorage("ARG", cmd.Arg2)
 		return lines, nil
 	case "this":
-		lines := []string{
-			"@THIS",
-			"D=M",
-			fmt.Sprintf("@%d", cmd.Arg2),
-			"D=D+A",
-			"@R13",
-			"M=D",
-			"@SP",
-			"AM=M-1", // SP--, A = address of top value on stack
-			"D=M",
-			"@R13",
-			"A=M",
-			"M=D",
-		}
+		lines := genPopToAddressWithAuxStorage("THIS", cmd.Arg2)
 		return lines, nil
 	case "that":
-		lines := []string{
-			"@THAT",
-			"D=M",
-			fmt.Sprintf("@%d", cmd.Arg2),
-			"D=D+A",
-			"@R13",
-			"M=D",
-			"@SP",
-			"AM=M-1", // SP--, A = address of top value on stack
-			"D=M",
-			"@R13",
-			"A=M",
-			"M=D",
-		}
+		lines := genPopToAddressWithAuxStorage("THAT", cmd.Arg2)
 		return lines, nil
 	case "local":
-		// local held in RAM[1]
-		lines := []string{
-			"@LCL",
-			"D=M",
-			fmt.Sprintf("@%d", cmd.Arg2),
-			"D=D+A",
-			"@R13",
-			"M=D",
-			"@SP",
-			"AM=M-1", // SP--, A = address of top value on stack
-			"D=M",
-			"@R13",
-			"A=M",
-			"M=D",
-		}
+		lines := genPopToAddressWithAuxStorage("LCL", cmd.Arg2)
 		return lines, nil
 	case "temp":
 		// temp is a fixed 8-slot region at RAM[5..12]; address = 5 + i (direct).
