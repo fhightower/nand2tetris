@@ -103,7 +103,7 @@ func ParseFile(r io.ReadSeeker) ([]VmCommand, error) {
 		vmCommand, err := parseCommand(rawCommand)
 
 		if err != nil {
-			return cmds, nil
+			return nil, err
 		}
 		cmds = append(cmds, vmCommand)
 
