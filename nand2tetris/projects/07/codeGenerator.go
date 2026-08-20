@@ -51,7 +51,7 @@ func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, er
 			"AM=M-1", // SP--, A = address of top value (y)
 			"D=M",    // D = y
 			"A=A-1",  // A = address of next value (x)
-			"M=M+D",  // x = x + y
+			"M=D+M",  // x = y + x
 		}, labelCounter, nil
 	case "sub":
 		return []string{
@@ -79,7 +79,7 @@ func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, er
 			"AM=M-1",
 			"D=M",
 			"A=A-1",
-			"M=M&D",
+			"M=D&M",
 		}, labelCounter, nil
 	case "or":
 		return []string{
@@ -87,7 +87,7 @@ func handleArithmeticCommand(cmd VmCommand, labelCounter int) ([]string, int, er
 			"AM=M-1",
 			"D=M",
 			"A=A-1",
-			"M=M|D",
+			"M=D|M",
 		}, labelCounter, nil
 	case "not":
 		return []string{
@@ -123,7 +123,7 @@ func handlePushCommand(cmd VmCommand, fileName string) ([]string, error) {
 			fmt.Sprintf("@%d", cmd.Arg2),
 			"D=A", // D = i
 			fmt.Sprintf("@%s", base),
-			"A=M+D", // A = base + i
+			"A=D+M", // A = i + base
 			"D=M",   // D = *(base + i)
 		}
 		return append(lines, pushD...), nil
