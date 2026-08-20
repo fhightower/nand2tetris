@@ -191,21 +191,13 @@ func genPopToAddressWithAuxStorage(destination string, offset int) []string {
 }
 
 func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
+	if base, ok := pointerSegments[cmd.Arg1]; ok {
+		return genPopToAddressWithAuxStorage(base, cmd.Arg2), nil
+	}
+
 	// Note: there is intentionally no support for `constant` in the switch...
 	// statement below as you can't pop a constant
 	switch cmd.Arg1 {
-	case "argument":
-		lines := genPopToAddressWithAuxStorage("ARG", cmd.Arg2)
-		return lines, nil
-	case "this":
-		lines := genPopToAddressWithAuxStorage("THIS", cmd.Arg2)
-		return lines, nil
-	case "that":
-		lines := genPopToAddressWithAuxStorage("THAT", cmd.Arg2)
-		return lines, nil
-	case "local":
-		lines := genPopToAddressWithAuxStorage("LCL", cmd.Arg2)
-		return lines, nil
 	case "temp":
 		// temp is a fixed 8-slot region at RAM[5..12]; address = 5 + i (direct).
 		return genPopToAddress(fmt.Sprintf("%d", 5+cmd.Arg2)), nil
