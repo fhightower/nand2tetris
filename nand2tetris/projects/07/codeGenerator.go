@@ -211,6 +211,47 @@ func handlePopCommand(cmd VmCommand, fileName string) ([]string, error) {
 	return nil, fmt.Errorf("unsupported pop segment: %s", cmd.Arg1)
 }
 
+// handleLabelCommand emits the asm label for `label X`.
+func handleLabelCommand(cmd VmCommand) ([]string, error) {
+	// todo: implement
+	return nil, fmt.Errorf("unsupported command: %s", cmd.Raw)
+}
+
+// handleGotoCommand emits an unconditional jump for `goto X`.
+func handleGotoCommand(cmd VmCommand) ([]string, error) {
+	// todo: implement
+	return nil, fmt.Errorf("unsupported command: %s", cmd.Raw)
+}
+
+// handleIfCommand pops the top of the stack and jumps if it is non-zero
+// for `if-goto X`.
+func handleIfCommand(cmd VmCommand) ([]string, error) {
+	// todo: implement
+	return nil, fmt.Errorf("unsupported command: %s", cmd.Raw)
+}
+
+// handleFunctionCommand emits the function entry label for
+// `function f nVars` and initializes nVars locals to 0.
+func handleFunctionCommand(cmd VmCommand) ([]string, error) {
+	// todo: implement
+	return nil, fmt.Errorf("unsupported command: %s", cmd.Raw)
+}
+
+// handleCallCommand emits the calling sequence for `call f nArgs`: push the
+// return address plus the saved segment pointers, reposition ARG/LCL, jump to
+// f, and emit the return label. labelCounter keeps return labels unique.
+func handleCallCommand(cmd VmCommand, labelCounter int) ([]string, int, error) {
+	// todo: implement
+	return nil, labelCounter, fmt.Errorf("unsupported command: %s", cmd.Raw)
+}
+
+// handleReturnCommand emits the return sequence: copy the return value over
+// arg 0, restore the caller's segment pointers, and jump to the return address.
+func handleReturnCommand(cmd VmCommand) ([]string, error) {
+	// todo: implement
+	return nil, fmt.Errorf("unsupported command: %s", cmd.Raw)
+}
+
 func GenerateAssembly(cmds []VmCommand, fileName string) ([]string, error) {
 	var assembly []string
 	labelCounter := 0
@@ -233,6 +274,43 @@ func GenerateAssembly(cmds []VmCommand, fileName string) ([]string, error) {
 			assembly = append(assembly, lines...)
 		case C_POP:
 			lines, err := handlePopCommand(cmd, fileName)
+			if err != nil {
+				return assembly, err
+			}
+			assembly = append(assembly, lines...)
+		case C_LABEL:
+			lines, err := handleLabelCommand(cmd)
+			if err != nil {
+				return assembly, err
+			}
+			assembly = append(assembly, lines...)
+		case C_GOTO:
+			lines, err := handleGotoCommand(cmd)
+			if err != nil {
+				return assembly, err
+			}
+			assembly = append(assembly, lines...)
+		case C_IF:
+			lines, err := handleIfCommand(cmd)
+			if err != nil {
+				return assembly, err
+			}
+			assembly = append(assembly, lines...)
+		case C_FUNCTION:
+			lines, err := handleFunctionCommand(cmd)
+			if err != nil {
+				return assembly, err
+			}
+			assembly = append(assembly, lines...)
+		case C_CALL:
+			lines, newLabelCounter, err := handleCallCommand(cmd, labelCounter)
+			labelCounter = newLabelCounter
+			if err != nil {
+				return assembly, err
+			}
+			assembly = append(assembly, lines...)
+		case C_RETURN:
+			lines, err := handleReturnCommand(cmd)
 			if err != nil {
 				return assembly, err
 			}
