@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -37,13 +36,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(prog)
 
 	assembly, err := GenerateAssembly(prog, fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(assembly)
 
 	err = writeAssembly(fileName, assembly)
 	if err != nil {

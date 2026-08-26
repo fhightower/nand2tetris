@@ -230,8 +230,8 @@ func handleIfCommand(cmd VmCommand) ([]string, error) {
 	return nil, fmt.Errorf("unsupported command: %s", cmd.Raw)
 }
 
-// handleFunctionCommand emits the function entry label for
-// `function f nVars` and initializes nVars locals to 0.
+// handleFunctionCommand emits the entry point for `function f nVars`: the
+// label f, followed by nVars local variables initialized to 0.
 func handleFunctionCommand(cmd VmCommand) ([]string, error) {
 	// todo: implement
 	return nil, fmt.Errorf("unsupported command: %s", cmd.Raw)
@@ -256,7 +256,6 @@ func GenerateAssembly(cmds []VmCommand, fileName string) ([]string, error) {
 	var assembly []string
 	labelCounter := 0
 
-	// todo: implement
 	for _, cmd := range cmds {
 		switch cmd.Type {
 		case C_ARITHMETIC:
