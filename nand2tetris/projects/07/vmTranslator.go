@@ -11,11 +11,14 @@ func writeAssembly(fileName string, assembly []string) error {
 	assemblyFileName := strings.Replace(fileName, ".vm", ".asm", 1)
 	outputFile, err := os.Create(assemblyFileName)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer outputFile.Close()
 
-	outputFile.WriteString(strings.Join(assembly, "\n"))
+	_, err = outputFile.WriteString(strings.Join(assembly, "\n") + "\n")
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
